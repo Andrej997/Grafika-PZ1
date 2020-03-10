@@ -25,14 +25,20 @@ namespace PZ1
         public static string clickedName;
         public static object Object;
         public static List<object> List;
+        public static List<object> UndoList;
         public static List<Point> PolygonPoints;
+        // promenljiva koja se aktivira kada je sve ocisnjeno
+        // da bi mogli odjenom da vratimo sve
+        public bool AllCleared; 
         #endregion
 
         public MainWindow()
         {
             InitializeComponent();
             List = new List<object>();
+            UndoList = new List<object>();
             PolygonPoints = new List<Point>();
+            AllCleared = false;
         }
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -52,6 +58,11 @@ namespace PZ1
                 else if (clickedName == "rectangle")
                     canvas.Children.Add((Rectangle)Object);
                 List.Add(Object);
+
+                // posto smo dodali novi element
+                // cistimo undo listu, da redo ne bi
+                // mogao da radi
+                UndoList.Clear();
             }
         }
 
@@ -70,6 +81,125 @@ namespace PZ1
             PolygonPoints.Clear();
 
             List.Add(Object);
+
+            // posto smo dodali novi element
+            // cistimo undo listu, da redo ne bi
+            // mogao da radi
+            UndoList.Clear();
+        }
+
+        private void MenuItem_Clear(object sender, MouseButtonEventArgs e)
+        {
+            Ellipse ellipse;
+            Rectangle rectangle;
+            Polyline polyline;
+
+            foreach (var obj in List)
+            {
+                try
+                {
+                    ellipse = (Ellipse)obj;
+                    //prvo dodamo u Undo listu da bi mogli da vratimo
+                    UndoList.Add(ellipse);
+                    canvas.Children.Remove(ellipse);
+                }
+                catch
+                {
+                    try
+                    {
+                        rectangle = (Rectangle)obj;
+                        //prvo dodamo u Undo listu da bi mogli da vratimo
+                        UndoList.Add(rectangle);
+                        canvas.Children.Remove(rectangle);
+                    }
+                    catch 
+                    {
+                        try
+                        {
+                            polyline = (Polyline)obj;
+                            //prvo dodamo u Undo listu da bi mogli da vratimo
+                            UndoList.Add(polyline);
+                            canvas.Children.Remove(polyline);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+            AllCleared = true;
+        }
+
+        private void MenuItem_Undo(object sender, MouseButtonEventArgs e)
+        {
+            // ako je uradjen clear, vracamo sve odjednom
+            if (AllCleared == true)
+            {
+                foreach (var obj in UndoList)
+                {
+                    try
+                    {
+                        canvas.Children.Add((Ellipse)obj);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            canvas.Children.Add((Rectangle)obj);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                canvas.Children.Add((Polyline)obj);
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                }
+                UndoList.Clear();
+                // posto je vracemo, onemogucavamo ovu naredbu
+                AllCleared = false;
+            }
+            else if (canvas.Children.Count > 0)
+            {
+                    UndoList.Add(canvas.Children[canvas.Children.Count - 1]);
+                    canvas.Children.RemoveAt(canvas.Children.Count - 1);
+                
+            }
+        }
+
+        private void MenuItem_Redo(object sender, MouseButtonEventArgs e)
+        {
+            if (UndoList.Count > 0 && AllCleared == false /*da ne moze da se pozove ako je prethodna naredba bila clear*/)
+            {
+                try
+                {
+                    canvas.Children.Add((Ellipse)UndoList[0]);
+                    UndoList.RemoveAt(0);
+                }
+                catch
+                {
+                    try
+                    {
+                        canvas.Children.Add((Rectangle)UndoList[0]);
+                        UndoList.RemoveAt(0);
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            canvas.Children.Add((Polyline)UndoList[0]);
+                            UndoList.RemoveAt(0);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
         }
     }
 }

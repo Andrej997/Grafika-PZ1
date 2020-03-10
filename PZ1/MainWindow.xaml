@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PZ1"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        Title="PZ2" Height="450" Width="800">
+        Title="PZ1" Height="450" Width="800">
     <Grid>
         <ToolBar Background="WhiteSmoke" Margin="0,0,0,368" Width="800">
             <Menu DockPanel.Dock="Top">
@@ -39,21 +39,21 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Name="undo"
-                          PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
+                          PreviewMouseLeftButtonDown="MenuItem_Undo"
                           ToolTip="Undo">
                     <MenuItem.Icon>
                         <Image Source="/Icons/undo.png" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Name="redo"
-                          PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
+                          PreviewMouseLeftButtonDown="MenuItem_Redo"
                           ToolTip="Redo">
                     <MenuItem.Icon>
                         <Image Source="/Icons/redo.png" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Name="clear"
-                          PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
+                          PreviewMouseLeftButtonDown="MenuItem_Clear"
                           ToolTip="Clear">
                     <MenuItem.Icon>
                         <Image Source="/Icons/clear.png" />
