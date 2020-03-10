@@ -29,7 +29,16 @@ namespace PZ1
         public static List<Point> PolygonPoints;
         // promenljiva koja se aktivira kada je sve ocisnjeno
         // da bi mogli odjenom da vratimo sve
-        public bool AllCleared; 
+        public bool AllCleared;
+        // posto se levim klikom na povrsinu 
+        // otvara setting za podesavanje param
+        // ova promenljiva sluzi da obezbedi
+        // to otvaranja samo kada je potrebno
+        private bool IsPolygon;
+        // index elementa koji menjamo
+        int index;
+        // izmenjen objekat
+        public static object tempObject;
         #endregion
 
         public MainWindow()
@@ -39,24 +48,38 @@ namespace PZ1
             UndoList = new List<object>();
             PolygonPoints = new List<Point>();
             AllCleared = false;
+            IsPolygon = false;
+            index = -1;
         }
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (clickedName == "polygon")
             {
+                IsPolygon = true;
                 Point = Mouse.GetPosition(canvas);
                 PolygonPoints.Add(Point);
             }
-            else
+            else if(clickedName == "ellipse" || clickedName == "rectangle")
             {
+                // posto nije pologon aktiviran, on se mora za svaki slucaj deaktivirati
+                IsPolygon = false; 
+
                 Point = Mouse.GetPosition(canvas);
                 Settings settingsWindow = new Settings(clickedName, Point);
                 settingsWindow.ShowDialog();
                 if (clickedName == "ellipse")
-                    canvas.Children.Add((Ellipse)Object);
+                {
+                    Ellipse ellipse = (Ellipse)Object;
+                    ellipse.MouseLeftButtonDown += OnObjectClicked; 
+                    canvas.Children.Add(ellipse);
+                }
                 else if (clickedName == "rectangle")
-                    canvas.Children.Add((Rectangle)Object);
+                {
+                    Rectangle rectangle = (Rectangle)Object;
+                    rectangle.MouseLeftButtonDown += OnObjectClicked;
+                    canvas.Children.Add(rectangle);
+                }
                 List.Add(Object);
 
                 // posto smo dodali novi element
@@ -74,25 +97,35 @@ namespace PZ1
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Settings settingsWindow = new Settings(clickedName, PolygonPoints);
-            settingsWindow.ShowDialog();
+            if (IsPolygon == true) 
+            {
+                Settings settingsWindow = new Settings(clickedName, PolygonPoints);
+                settingsWindow.ShowDialog();
 
-            canvas.Children.Add((Polyline)Object);
-            PolygonPoints.Clear();
+                Polygon polygon = (Polygon)Object;
+                polygon.MouseLeftButtonDown += OnObjectClicked;
+                canvas.Children.Add(polygon);
 
-            List.Add(Object);
+                PolygonPoints.Clear();
 
-            // posto smo dodali novi element
-            // cistimo undo listu, da redo ne bi
-            // mogao da radi
-            UndoList.Clear();
+                List.Add(Object);
+
+                // posto smo dodali novi element
+                // cistimo undo listu, da redo ne bi
+                // mogao da radi
+                UndoList.Clear();
+
+                // posto je poligon iscrtan
+                // treba da ga deaktiviramo
+                IsPolygon = false;
+            }
         }
 
         private void MenuItem_Clear(object sender, MouseButtonEventArgs e)
         {
             Ellipse ellipse;
             Rectangle rectangle;
-            Polyline polyline;
+            Polygon polygon;
 
             foreach (var obj in List)
             {
@@ -116,10 +149,10 @@ namespace PZ1
                     {
                         try
                         {
-                            polyline = (Polyline)obj;
+                            polygon = (Polygon)obj;
                             //prvo dodamo u Undo listu da bi mogli da vratimo
-                            UndoList.Add(polyline);
-                            canvas.Children.Remove(polyline);
+                            UndoList.Add(polygon);
+                            canvas.Children.Remove(polygon);
                         }
                         catch
                         {
@@ -151,7 +184,7 @@ namespace PZ1
                         {
                             try
                             {
-                                canvas.Children.Add((Polyline)obj);
+                                canvas.Children.Add((Polygon)obj);
                             }
                             catch
                             {
@@ -191,12 +224,70 @@ namespace PZ1
                     {
                         try
                         {
-                            canvas.Children.Add((Polyline)UndoList[0]);
+                            canvas.Children.Add((Polygon)UndoList[0]);
                             UndoList.RemoveAt(0);
                         }
                         catch
                         {
                         }
+                    }
+                }
+            }
+        }
+
+        private void OnObjectClicked(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                Ellipse ellipse = (Ellipse)sender;
+                // pronalazak indexa elementa
+                for (int i = 0; i < canvas.Children.Count; i++)
+                {
+                    if (ellipse == canvas.Children[i])
+                        index = i;
+                }
+                Settings settings = new Settings(ellipse);
+                settings.ShowDialog();
+                // prepisivanje starog s novim
+                canvas.Children[index] = (Ellipse)tempObject;
+                index = -1;
+            }
+            catch
+            {
+                try
+                {
+                    Rectangle rectangle = (Rectangle)sender;
+                    // pronalazak indexa elementa
+                    for (int i = 0; i < canvas.Children.Count; i++)
+                    {
+                        if (rectangle == canvas.Children[i])
+                            index = i;
+                    }
+                    Settings settings = new Settings(rectangle);
+                    settings.ShowDialog();
+                    // prepisivanje starog s novim
+                    canvas.Children[index] = (Rectangle)tempObject;
+                    index = -1;
+                }
+                catch 
+                {
+                    try
+                    {
+                        Polygon polygon = (Polygon)sender;
+                        // pronalazak indexa elementa
+                        for (int i = 0; i < canvas.Children.Count; i++)
+                        {
+                            if (polygon == canvas.Children[i])
+                                index = i;
+                        }
+                        Settings settings = new Settings(polygon);
+                        settings.ShowDialog();
+                        // prepisivanje starog s novim
+                        canvas.Children[index] = (Polygon)tempObject;
+                        index = -1;
+                    }
+                    catch 
+                    {
                     }
                 }
             }
