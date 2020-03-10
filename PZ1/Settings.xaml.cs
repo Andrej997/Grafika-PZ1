@@ -125,17 +125,17 @@ namespace PZ1
         #endregion
 
         #region Buttons
-        private void BtCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+        private void BtCancel_Click(object sender, RoutedEventArgs e) => this.Close();
 
         private void BtDraw_Click(object sender, RoutedEventArgs e)
         {
             #region Settings parameters
-            double height = Double.Parse(tbHeight.Text);
-            double width = Double.Parse(tbWidth.Text);
-            double borderThickness = Int32.Parse(tbBorderThickness.Text);
+            double height = 0;
+            Double.TryParse(tbHeight.Text, out height);
+            double width = 0;
+            Double.TryParse(tbWidth.Text, out width);
+            double borderThickness = 0;
+            Double.TryParse(tbBorderThickness.Text, out borderThickness);
             #endregion
 
             if (eT == "ellipse")

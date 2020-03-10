@@ -39,6 +39,8 @@ namespace PZ1
         int index;
         // izmenjen objekat
         public static object tempObject;
+        // za bojenje menija
+        private SolidColorBrush menuItemBrush;
         #endregion
 
         public MainWindow()
@@ -50,6 +52,8 @@ namespace PZ1
             AllCleared = false;
             IsPolygon = false;
             index = -1;
+            menuItemBrush = new SolidColorBrush();
+            menuItemBrush.Color = Colors.LightGray;
         }
 
         private void Canvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -68,24 +72,29 @@ namespace PZ1
                 Point = Mouse.GetPosition(canvas);
                 Settings settingsWindow = new Settings(clickedName, Point);
                 settingsWindow.ShowDialog();
-                if (clickedName == "ellipse")
+                if (Object != null)
                 {
-                    Ellipse ellipse = (Ellipse)Object;
-                    ellipse.MouseLeftButtonDown += OnObjectClicked; 
-                    canvas.Children.Add(ellipse);
-                }
-                else if (clickedName == "rectangle")
-                {
-                    Rectangle rectangle = (Rectangle)Object;
-                    rectangle.MouseLeftButtonDown += OnObjectClicked;
-                    canvas.Children.Add(rectangle);
-                }
-                List.Add(Object);
+                    if (clickedName == "ellipse")
+                    {
+                        Ellipse ellipseTemp = (Ellipse)Object;
+                        ellipseTemp.MouseLeftButtonDown += OnObjectClicked;
+                        canvas.Children.Add(ellipseTemp);
+                        ellipse.Background = null;
+                    }
+                    else if (clickedName == "rectangle")
+                    {
+                        Rectangle rectangleTemp = (Rectangle)Object;
+                        rectangleTemp.MouseLeftButtonDown += OnObjectClicked;
+                        canvas.Children.Add(rectangleTemp);
+                        rectangle.Background = null;
+                    }
+                    List.Add(Object);
 
-                // posto smo dodali novi element
-                // cistimo undo listu, da redo ne bi
-                // mogao da radi
-                UndoList.Clear();
+                    // posto smo dodali novi element
+                    // cistimo undo listu, da redo ne bi
+                    // mogao da radi
+                    UndoList.Clear();
+                }
             }
         }
 
@@ -93,6 +102,12 @@ namespace PZ1
         {
             var clicked = (MenuItem)sender;
             clickedName = clicked.Name;
+            if (clickedName == "ellipse")
+                ellipse.Background = menuItemBrush;
+            else if (clickedName == "rectangle")
+                rectangle.Background = menuItemBrush;
+            else if (clickedName == "polygon")
+                polygon.Background = menuItemBrush;
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -101,23 +116,26 @@ namespace PZ1
             {
                 Settings settingsWindow = new Settings(clickedName, PolygonPoints);
                 settingsWindow.ShowDialog();
+                if (Object != null)
+                {
+                    Polygon polygon = (Polygon)Object;
+                    polygon.MouseLeftButtonDown += OnObjectClicked;
+                    canvas.Children.Add(polygon);
 
-                Polygon polygon = (Polygon)Object;
-                polygon.MouseLeftButtonDown += OnObjectClicked;
-                canvas.Children.Add(polygon);
+                    PolygonPoints.Clear();
 
-                PolygonPoints.Clear();
+                    List.Add(Object);
 
-                List.Add(Object);
+                    // posto smo dodali novi element
+                    // cistimo undo listu, da redo ne bi
+                    // mogao da radi
+                    UndoList.Clear();
 
-                // posto smo dodali novi element
-                // cistimo undo listu, da redo ne bi
-                // mogao da radi
-                UndoList.Clear();
-
-                // posto je poligon iscrtan
-                // treba da ga deaktiviramo
-                IsPolygon = false;
+                    // posto je poligon iscrtan
+                    // treba da ga deaktiviramo
+                    IsPolygon = false;
+                }
+                polygon.Background = null;
             }
         }
 
@@ -198,9 +216,8 @@ namespace PZ1
             }
             else if (canvas.Children.Count > 0)
             {
-                    UndoList.Add(canvas.Children[canvas.Children.Count - 1]);
-                    canvas.Children.RemoveAt(canvas.Children.Count - 1);
-                
+                UndoList.Add(canvas.Children[canvas.Children.Count - 1]);
+                canvas.Children.RemoveAt(canvas.Children.Count - 1);
             }
         }
 
@@ -210,22 +227,22 @@ namespace PZ1
             {
                 try
                 {
-                    canvas.Children.Add((Ellipse)UndoList[0]);
-                    UndoList.RemoveAt(0);
+                    canvas.Children.Add((Ellipse)UndoList[UndoList.Count - 1]);
+                    UndoList.RemoveAt(UndoList.Count - 1);
                 }
                 catch
                 {
                     try
                     {
-                        canvas.Children.Add((Rectangle)UndoList[0]);
-                        UndoList.RemoveAt(0);
+                        canvas.Children.Add((Rectangle)UndoList[UndoList.Count - 1]);
+                        UndoList.RemoveAt(UndoList.Count - 1);
                     }
                     catch
                     {
                         try
                         {
-                            canvas.Children.Add((Polygon)UndoList[0]);
-                            UndoList.RemoveAt(0);
+                            canvas.Children.Add((Polygon)UndoList[UndoList.Count - 1]);
+                            UndoList.RemoveAt(UndoList.Count - 1);
                         }
                         catch
                         {
