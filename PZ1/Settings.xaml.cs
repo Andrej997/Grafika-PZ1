@@ -30,6 +30,7 @@ namespace PZ1
         private Ellipse ellipsePriv;
         private Rectangle rectanglePriv;
         private Polygon polygonPriv;
+        private Image imagePriv;
         #endregion
 
         #region Constructors
@@ -63,6 +64,7 @@ namespace PZ1
             tbHeight.IsReadOnly = true;
             tbWidth.IsReadOnly = true;
             SetComboBox();
+            btImage.Visibility = Visibility.Hidden;
         }
 
         public Settings(Ellipse ellipse)
@@ -89,6 +91,16 @@ namespace PZ1
             SetComboBox();
         }
 
+        public Settings(Image image)
+        {
+            InitializeComponent();
+            eT = "image";
+            imagePriv = image;
+            tbHeight.Text = image.Height.ToString();
+            tbWidth.Text = image.Width.ToString();
+            LASFCI();
+        }
+
         public Settings(Polygon polygon)
         {
             InitializeComponent();
@@ -100,6 +112,7 @@ namespace PZ1
             LockAndSet();
             SetComboBox();
         }
+
         #endregion
 
         #region DrawingShapes
@@ -130,6 +143,7 @@ namespace PZ1
             double top = desiredCenterY;
 
             image.Margin = new Thickness(left, top, 0, 0);
+            image.Stretch = Stretch.Fill;
             return image;
         }
 
@@ -227,6 +241,13 @@ namespace PZ1
                     MainWindow.Object = polygon;
                 }
             }
+            else if (eT == "image")
+            {
+                if (changingElement == true)
+                {
+                    MainWindow.tempObject = imagePriv;
+                }
+            }
 
             this.Close();
         }
@@ -252,10 +273,18 @@ namespace PZ1
                 bitmap.UriSource = new Uri(selectedFileName);
                 bitmap.EndInit();
 
-                Image dynamicImage = CreateImage(width, height, pt.X, pt.Y);
-                dynamicImage.Source = bitmap;
+                if (changingElement == true)
+                {
+                    imagePriv.Source = bitmap;
+                    //MainWindow.tempObject = imagePriv;
+                }
+                else
+                {
+                    Image dynamicImage = CreateImage(width, height, pt.X, pt.Y);
+                    dynamicImage.Source = bitmap;
 
-                MainWindow.Object = dynamicImage;
+                    MainWindow.Object = dynamicImage;
+                }
             }
         }
         #endregion
@@ -279,6 +308,22 @@ namespace PZ1
             tbWidth.IsReadOnly = true;
             changingElement = true;
             btDraw.Content = "Change";
+            btImage.Visibility = Visibility.Hidden;
+        }
+
+        // Lock and Set For Changing Image
+        private void LASFCI()
+        {
+            lBorderThickness.Content = "Choose image";
+            cbBorderColor.Visibility = Visibility.Hidden;
+            lFillColor.Visibility = Visibility.Hidden;
+            lBorderColor.Visibility = Visibility.Hidden;
+            cbFillColor.Visibility = Visibility.Hidden;
+            tbBorderThickness.Visibility = Visibility.Hidden;
+            tbHeight.IsReadOnly = true;
+            tbWidth.IsReadOnly = true;
+            btDraw.Content = "Change";
+            changingElement = true;
         }
 
         #endregion

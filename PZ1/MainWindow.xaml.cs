@@ -92,7 +92,7 @@ namespace PZ1
                     else if (clickedName == "image")
                     {
                         Image image = (Image)Object;
-                        //image.MouseLeftButtonDown += OnObjectClicked;
+                        image.MouseLeftButtonDown += OnObjectClicked;
                         canvas.Children.Add(image);
                     }
                     List.Add(Object);
@@ -204,6 +204,24 @@ namespace PZ1
                     }
                     catch
                     {
+                        try
+                        {
+                            Image image = (Image)sender;
+                            // pronalazak indexa elementa
+                            for (int i = 0; i < canvas.Children.Count; i++)
+                            {
+                                if (image == canvas.Children[i])
+                                    index = i;
+                            }
+                            Settings settings = new Settings(image);
+                            settings.ShowDialog();
+                            // prepisivanje starog s novim
+                            canvas.Children[index] = (Image)tempObject;
+                            index = -1;
+                        }
+                        catch
+                        {
+                        }
                     }
                 }
             }
@@ -216,6 +234,7 @@ namespace PZ1
             Ellipse ellipse;
             Rectangle rectangle;
             Polygon polygon;
+            Image image;
 
             foreach (var obj in List)
             {
@@ -246,6 +265,16 @@ namespace PZ1
                         }
                         catch
                         {
+                            try
+                            {
+                                image = (Image)obj;
+                                //prvo dodamo u Undo listu da bi mogli da vratimo
+                                UndoList.Add(image);
+                                canvas.Children.Remove(image);
+                            }
+                            catch 
+                            {
+                            }
                         }
                     }
                 }
@@ -280,6 +309,13 @@ namespace PZ1
                             }
                             catch
                             {
+                                try
+                                {
+                                    canvas.Children.Add((Image)obj);
+                                }
+                                catch
+                                {
+                                }
                             }
                         }
                     }
@@ -322,6 +358,14 @@ namespace PZ1
                         }
                         catch
                         {
+                            try
+                            {
+                                canvas.Children.Add((Image)UndoList[UndoList.Count - 1]);
+                                UndoList.RemoveAt(UndoList.Count - 1);
+                            }
+                            catch
+                            {
+                            }
                         }
                     }
                 }
