@@ -91,7 +91,9 @@ namespace PZ1
                     }
                     else if (clickedName == "image")
                     {
-
+                        Image image = (Image)Object;
+                        //image.MouseLeftButtonDown += OnObjectClicked;
+                        canvas.Children.Add(image);
                     }
                     List.Add(Object);
 

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -38,10 +39,12 @@ namespace PZ1
             eT = elementType;
             if (eT == "image")
             {
-                lBorderColor.Content = "Choose image";
+                lBorderThickness.Content = "Choose image";
                 cbBorderColor.Visibility = Visibility.Hidden;
                 lFillColor.Visibility = Visibility.Hidden;
+                lBorderColor.Visibility = Visibility.Hidden; 
                 cbFillColor.Visibility = Visibility.Hidden;
+                tbBorderThickness.Visibility = Visibility.Hidden;
             }
             else
             {
@@ -118,6 +121,16 @@ namespace PZ1
 
             rectangle.Margin = new Thickness(left, top, 0, 0);
             return rectangle;
+        }
+
+        private Image CreateImage(double width, double height, double desiredCenterX, double desiredCenterY)
+        {
+            Image image = new Image { Width = width, Height = height };
+            double left = desiredCenterX;
+            double top = desiredCenterY;
+
+            image.Margin = new Thickness(left, top, 0, 0);
+            return image;
         }
 
         private Polygon DrawLine(List<Point> points)
@@ -217,11 +230,33 @@ namespace PZ1
 
             this.Close();
         }
+
         private void BtImage_Click(object sender, RoutedEventArgs e)
         {
-            // kada se ucita slika
-            lFillColor.Content = "naziv slike";
-            lFillColor.Visibility = Visibility.Visible;
+            double height = 0;
+            Double.TryParse(tbHeight.Text, out height);
+            double width = 0;
+            Double.TryParse(tbWidth.Text, out width);
+
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.InitialDirectory = "c:\\";
+            dlg.Filter = "Image files (*.jpg)|*.jpg|All Files (*.*)|*.*";
+            dlg.RestoreDirectory = true;
+
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string selectedFileName = dlg.FileName;
+                //lBorderThickness.Content = selectedFileName;
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(selectedFileName);
+                bitmap.EndInit();
+
+                Image dynamicImage = CreateImage(width, height, pt.X, pt.Y);
+                dynamicImage.Source = bitmap;
+
+                MainWindow.Object = dynamicImage;
+            }
         }
         #endregion
 
