@@ -36,6 +36,17 @@ namespace PZ1
         {
             InitializeComponent();
             eT = elementType;
+            if (eT == "image")
+            {
+                lBorderColor.Content = "Choose image";
+                cbBorderColor.Visibility = Visibility.Hidden;
+                lFillColor.Visibility = Visibility.Hidden;
+                cbFillColor.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                btImage.Visibility = Visibility.Hidden;
+            }
             pt = point;
 
             SetComboBox();
@@ -46,7 +57,8 @@ namespace PZ1
             InitializeComponent();
             eT = elementType;
             points = lpoints;
-
+            tbHeight.IsReadOnly = true;
+            tbWidth.IsReadOnly = true;
             SetComboBox();
         }
 
@@ -91,7 +103,7 @@ namespace PZ1
         private Ellipse CreateEllipse(double width, double height, double desiredCenterX, double desiredCenterY)
         {
             Ellipse ellipse = new Ellipse { Width = width, Height = height };
-            double left = desiredCenterX;// - (width / 2);
+            double left = desiredCenterX;// - (width / 2); // deo ako zelimo da tracka bude u centru
             double top = desiredCenterY;// - (height / 2);
 
             ellipse.Margin = new Thickness(left, top, 0, 0);
@@ -205,6 +217,12 @@ namespace PZ1
 
             this.Close();
         }
+        private void BtImage_Click(object sender, RoutedEventArgs e)
+        {
+            // kada se ucita slika
+            lFillColor.Content = "naziv slike";
+            lFillColor.Visibility = Visibility.Visible;
+        }
         #endregion
 
         #region Methods
@@ -227,6 +245,8 @@ namespace PZ1
             changingElement = true;
             btDraw.Content = "Change";
         }
+
         #endregion
+        
     }
 }
