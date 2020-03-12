@@ -6,21 +6,42 @@
         xmlns:local="clr-namespace:PZ1"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        Title="Settings" Height="223" Width="276.5">
+        Title="Settings" Height="223" Width="315.248" Loaded="Window_Loaded">
     <Grid>
         <Label x:Name="lHeight" Content="Height" HorizontalAlignment="Left" Margin="10,13,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lWidth" Content="Width" HorizontalAlignment="Left" Margin="10,39,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lFillColor" Content="Fill Color" HorizontalAlignment="Left" Margin="10,118,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lBorderColor" Content="Border Color" HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top"/>
         <Label x:Name="lBorderThickness" Content="Border Thickness" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="tbHeight" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Margin="135,13,0,0"/>
-        <TextBox x:Name="tbWidth" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Margin="135,41,0,0"/>
-        <ComboBox x:Name="cbFillColor" HorizontalAlignment="Left" Margin="135,123,0,0" VerticalAlignment="Top" Width="120"/>
-        <ComboBox x:Name="cbBorderColor" HorizontalAlignment="Left" Margin="135,96,0,0" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="tbBorderThickness" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" Margin="135,69,0,0"/>
-        <Button x:Name="btCancel" Content="Cancel" HorizontalAlignment="Left" Margin="10,161,0,0" VerticalAlignment="Top" Width="120" Click="BtCancel_Click"/>
-        <Button x:Name="btDraw" Content="Draw" HorizontalAlignment="Left" Margin="135,161,0,0" VerticalAlignment="Top" Width="120" Click="BtDraw_Click"/>
-        <Button x:Name="btImage" Content="Choose" HorizontalAlignment="Left" Margin="180,69,0,0" VerticalAlignment="Top" Width="75" Click="BtImage_Click"/>
+        <TextBox x:Name="tbHeight" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="162" Margin="135,13,0,0"/>
+        <TextBox x:Name="tbWidth" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="162" Margin="135,41,0,0"/>
+
+        <ComboBox x:Name="cbBorderColor" HorizontalAlignment="Left" Margin="135,96,0,0" VerticalAlignment="Top" Width="162" SelectionChanged="CbBorderColor_SelectionChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Height="10" Width="15" Fill="{Binding Name}"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <ComboBox x:Name="cbFillColor" HorizontalAlignment="Left" Margin="135,123,0,0" VerticalAlignment="Top" Width="162" SelectionChanged="CbFillColor_SelectionChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Height="10" Width="15" Fill="{Binding Name}"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBox x:Name="tbBorderThickness" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="162" Margin="135,69,0,0"/>
+        <Button x:Name="btCancel" Content="Cancel" HorizontalAlignment="Left" Margin="10,161,0,0" VerticalAlignment="Top" Width="141" Click="BtCancel_Click"/>
+        <Button x:Name="btDraw" Content="Draw" HorizontalAlignment="Left" Margin="156,161,0,0" VerticalAlignment="Top" Width="141" Click="BtDraw_Click"/>
+        <Button x:Name="btImage" Content="Choose" HorizontalAlignment="Left" Margin="222,69,0,0" VerticalAlignment="Top" Width="75" Click="BtImage_Click"/>
 
     </Grid>
 </Window>

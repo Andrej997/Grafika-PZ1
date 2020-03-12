@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -31,6 +32,8 @@ namespace PZ1
         private Rectangle rectanglePriv;
         private Polygon polygonPriv;
         private Image imagePriv;
+        private SolidColorBrush borderColor;
+        private SolidColorBrush fillColor;
         #endregion
 
         #region Constructors
@@ -52,8 +55,6 @@ namespace PZ1
                 btImage.Visibility = Visibility.Hidden;
             }
             pt = point;
-
-            SetComboBox();
         }
 
         public Settings(string elementType, List<Point> lpoints)
@@ -63,7 +64,6 @@ namespace PZ1
             points = lpoints;
             tbHeight.IsReadOnly = true;
             tbWidth.IsReadOnly = true;
-            SetComboBox();
             btImage.Visibility = Visibility.Hidden;
         }
 
@@ -76,7 +76,6 @@ namespace PZ1
             tbWidth.Text = ellipse.Width.ToString();
             tbBorderThickness.Text = ellipse.StrokeThickness.ToString();
             LockAndSet();
-            SetComboBox();
         }
 
         public Settings(Rectangle rectangle)
@@ -88,7 +87,6 @@ namespace PZ1
             tbWidth.Text = rectangle.Width.ToString();
             tbBorderThickness.Text = rectangle.StrokeThickness.ToString();
             LockAndSet();
-            SetComboBox();
         }
 
         public Settings(Image image)
@@ -110,7 +108,6 @@ namespace PZ1
             tbWidth.Text = "0";
             tbBorderThickness.Text = polygon.StrokeThickness.ToString();
             LockAndSet();
-            SetComboBox();
         }
 
         #endregion
@@ -157,7 +154,7 @@ namespace PZ1
             }
             collection.Add(points[0]);
             line.Points = collection;
-            line.Stroke = new SolidColorBrush(Colors.Black);
+            line.Stroke = borderColor;
 
             return line;
         }
@@ -186,16 +183,11 @@ namespace PZ1
                 }
                 else
                 {
-                    SolidColorBrush blueBrush = new SolidColorBrush();
-                    blueBrush.Color = Colors.Blue;
-                    SolidColorBrush blackBrush = new SolidColorBrush();
-                    blackBrush.Color = Colors.Black;
-
                     Ellipse ellipse = CreateEllipse(width, height, pt.X, pt.Y);
                     ellipse.StrokeThickness = borderThickness;
-                    ellipse.Stroke = blackBrush;
+                    ellipse.Stroke = borderColor;
 
-                    ellipse.Fill = blueBrush;
+                    ellipse.Fill = fillColor;
 
                     MainWindow.Object = ellipse;
                 }
@@ -209,16 +201,11 @@ namespace PZ1
                 }
                 else
                 {
-                    SolidColorBrush blueBrush = new SolidColorBrush();
-                    blueBrush.Color = Colors.Blue;
-                    SolidColorBrush blackBrush = new SolidColorBrush();
-                    blackBrush.Color = Colors.Black;
-
                     Rectangle rectangle = CreateRectangle(width, height, pt.X, pt.Y);
                     rectangle.StrokeThickness = borderThickness;
-                    rectangle.Stroke = blackBrush;
+                    rectangle.Stroke = borderColor;
 
-                    rectangle.Fill = blueBrush;
+                    rectangle.Fill = fillColor;
 
                     MainWindow.Object = rectangle;
                 }
@@ -232,12 +219,9 @@ namespace PZ1
                 }
                 else
                 {
-                    SolidColorBrush blueBrush = new SolidColorBrush();
-                    blueBrush.Color = Colors.Blue;
-
                     Polygon polygon = DrawLine(points);
                     polygon.StrokeThickness = borderThickness;
-                    polygon.Fill = blueBrush;
+                    polygon.Fill = fillColor;
                     MainWindow.Object = polygon;
                 }
             }
@@ -291,18 +275,6 @@ namespace PZ1
         #endregion
 
         #region Methods
-        private void SetComboBox()
-        {
-            cbBorderColor.Items.Add("Blue");
-            cbBorderColor.Items.Add("Red");
-            cbBorderColor.Items.Add("Green");
-
-            cbFillColor.Items.Add("Blue");
-            cbFillColor.Items.Add("Red");
-            cbFillColor.Items.Add("Green");
-            cbFillColor.Items.Add("Black");
-        }
-
         private void LockAndSet()
         {
             tbHeight.IsReadOnly = true;
@@ -328,6 +300,25 @@ namespace PZ1
         }
 
         #endregion
-        
+
+        #region Comboboxes
+        private void CbBorderColor_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Color borderClr = (Color)(cbBorderColor.SelectedItem as PropertyInfo).GetValue(1, null);
+            borderColor = new SolidColorBrush(borderClr);
+        }
+
+        private void CbFillColor_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Color fillClr = (Color)(cbFillColor.SelectedItem as PropertyInfo).GetValue(1, null);
+            fillColor = new SolidColorBrush(fillClr);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            cbBorderColor.ItemsSource = typeof(Colors).GetProperties();
+            cbFillColor.ItemsSource = typeof(Colors).GetProperties();
+        }
+        #endregion
     }
 }
