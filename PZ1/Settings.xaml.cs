@@ -276,7 +276,8 @@ namespace PZ1
                 if (changingElement == true)
                 {
                     imagePriv.Source = bitmap;
-                    //MainWindow.tempObject = imagePriv;
+                    MainWindow.tempObject = imagePriv;
+                    this.Close();
                 }
                 else
                 {
