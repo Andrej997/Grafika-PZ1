@@ -5,62 +5,65 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PZ1"
         mc:Ignorable="d"
-        ResizeMode="NoResize"
-        Title="PZ1" Height="450" Width="800">
+        Title="PZ1" Height="450" Width="800"
+        MinWidth="498" MinHeight="87">
     <Grid>
-        <ToolBar Background="WhiteSmoke" Margin="0,0,0,368" Width="800">
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Name="ellipse"
+        <ToolBarPanel DockPanel.Dock="Top">
+            <ToolBar Height="50" Background="WhiteSmoke" ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded">
+                <Menu ToolBar.OverflowMode="Never">
+                    <MenuItem Name="ellipse"
                           PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
                           ToolTip="Ellipse">
-                    <MenuItem.Icon>
-                        <Image Source="/Icons/ellipse.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Name="rectangle"
+                        <MenuItem.Icon>
+                            <Image Source="/Icons/ellipse.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Name="rectangle"
                           PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
                           ToolTip="Rectangle">
-                    <MenuItem.Icon>
-                        <Image Source="/Icons/rectangle.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Name="polygon"
+                        <MenuItem.Icon>
+                            <Image Source="/Icons/rectangle.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Name="polygon"
                           PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
                           ToolTip="Polygon">
-                    <MenuItem.Icon>
-                        <Image Source="/Icons/polygon.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Name="image"
+                        <MenuItem.Icon>
+                            <Image Source="/Icons/polygon.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Name="image"
                           PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
                           ToolTip="Image">
-                    <MenuItem.Icon>
-                        <Image Source="/Icons/image.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Name="undo"
+                        <MenuItem.Icon>
+                            <Image Source="/Icons/image.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Name="undo"
                           PreviewMouseLeftButtonDown="MenuItem_Undo"
                           ToolTip="Undo">
-                    <MenuItem.Icon>
-                        <Image Source="/Icons/undo.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Name="redo"
+                        <MenuItem.Icon>
+                            <Image Source="/Icons/undo.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Name="redo"
                           PreviewMouseLeftButtonDown="MenuItem_Redo"
                           ToolTip="Redo">
-                    <MenuItem.Icon>
-                        <Image Source="/Icons/redo.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Name="clear"
+                        <MenuItem.Icon>
+                            <Image Source="/Icons/redo.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Name="clear"
                           PreviewMouseLeftButtonDown="MenuItem_Clear"
                           ToolTip="Clear">
-                    <MenuItem.Icon>
-                        <Image Source="/Icons/clear.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-            </Menu>
-        </ToolBar>
+                        <MenuItem.Icon>
+                            <Image Source="/Icons/clear.png" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+
+        </ToolBarPanel>
         <Canvas Background="White" Name="canvas" 
                 MouseRightButtonDown="Canvas_MouseRightButtonDown" 
                 MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
