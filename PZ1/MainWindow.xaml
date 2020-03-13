@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PZ1"
         mc:Ignorable="d"
-        Title="PZ1" Height="450" Width="800"
-        MinWidth="498" MinHeight="87">
+        Title="PZ1" Height="450" Width="800" 
+        MinWidth="498" MinHeight="87" Icon="/Icons/edit.png">
     <Grid>
         <ToolBarPanel DockPanel.Dock="Top">
-            <ToolBar Height="50" Background="WhiteSmoke" ToolBarTray.IsLocked="True" Loaded="ToolBar_Loaded">
-                <Menu ToolBar.OverflowMode="Never">
+            <ToolBar Height="50" Background="WhiteSmoke" 
+                     ToolBarTray.IsLocked="True" 
+                     Loaded="ToolBar_Loaded" >
+                <Menu ToolBar.OverflowMode="Never" Cursor="Hand">
                     <MenuItem Name="ellipse"
                           PreviewMouseLeftButtonDown="MenuItem_MouseLeftButtonDown"
                           ToolTip="Ellipse">
@@ -62,11 +64,10 @@
                     </MenuItem>
                 </Menu>
             </ToolBar>
-
         </ToolBarPanel>
         <Canvas Background="White" Name="canvas" 
                 MouseRightButtonDown="Canvas_MouseRightButtonDown" 
                 MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
-                Margin="0,51,0,0"></Canvas>
+                Margin="0,51,0,0" Cursor="Pen"/>
     </Grid>
 </Window>

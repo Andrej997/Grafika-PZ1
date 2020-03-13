@@ -76,6 +76,7 @@ namespace PZ1
             tbWidth.Text = ellipse.Width.ToString();
             tbBorderThickness.Text = ellipse.StrokeThickness.ToString();
             LockAndSet();
+
         }
 
         public Settings(Rectangle rectangle)
@@ -154,7 +155,6 @@ namespace PZ1
             }
             collection.Add(points[0]);
             line.Points = collection;
-            line.Stroke = borderColor;
 
             return line;
         }
@@ -170,8 +170,16 @@ namespace PZ1
             Double.TryParse(tbHeight.Text, out height);
             double width = 0;
             Double.TryParse(tbWidth.Text, out width);
-            double borderThickness = 0;
+            double borderThickness = 0; // ovo moze biti 0, jer mozda korisnik ne zeli okvir
             Double.TryParse(tbBorderThickness.Text, out borderThickness);
+
+            // visina i sirina ne smeju da budu manja od 0, ali nemaju ni smisla da budu 0,
+            // ali to ne vazi za poligon!
+            if ((height <= 0 || width <= 0 || borderThickness < 0) && eT != "polygon")
+            {
+                System.Windows.MessageBox.Show("You need to enter number parametars!", "Warning");
+                return;
+            }
             #endregion
 
             if (eT == "ellipse")
@@ -179,14 +187,19 @@ namespace PZ1
                 if (changingElement == true)
                 {
                     ellipsePriv.StrokeThickness = borderThickness;
+                    if (borderColor != null)
+                        ellipsePriv.Stroke = borderColor;
+                    if (fillColor != null)
+                        ellipsePriv.Fill = fillColor;
+
                     MainWindow.tempObject = ellipsePriv.StrokeThickness;
                 }
                 else
                 {
                     Ellipse ellipse = CreateEllipse(width, height, pt.X, pt.Y);
+                    CheckColors();
                     ellipse.StrokeThickness = borderThickness;
                     ellipse.Stroke = borderColor;
-
                     ellipse.Fill = fillColor;
 
                     MainWindow.Object = ellipse;
@@ -197,14 +210,18 @@ namespace PZ1
                 if (changingElement == true)
                 {
                     rectanglePriv.StrokeThickness = borderThickness;
+                    if (borderColor != null)
+                        rectanglePriv.Stroke = borderColor;
+                    if (fillColor != null)
+                        rectanglePriv.Fill = fillColor;
                     MainWindow.tempObject = rectanglePriv.StrokeThickness;
                 }
                 else
                 {
                     Rectangle rectangle = CreateRectangle(width, height, pt.X, pt.Y);
+                    CheckColors();
                     rectangle.StrokeThickness = borderThickness;
                     rectangle.Stroke = borderColor;
-
                     rectangle.Fill = fillColor;
 
                     MainWindow.Object = rectangle;
@@ -215,13 +232,19 @@ namespace PZ1
                 if (changingElement == true)
                 {
                     polygonPriv.StrokeThickness = borderThickness;
+                    if (fillColor != null)
+                        polygonPriv.Fill = fillColor;
+                    if (borderColor != null)
+                    polygonPriv.Stroke = borderColor;
                     MainWindow.tempObject = polygonPriv.StrokeThickness;
                 }
                 else
                 {
                     Polygon polygon = DrawLine(points);
+                    CheckColors();
                     polygon.StrokeThickness = borderThickness;
                     polygon.Fill = fillColor;
+                    polygon.Stroke = borderColor;
                     MainWindow.Object = polygon;
                 }
             }
@@ -275,6 +298,16 @@ namespace PZ1
         #endregion
 
         #region Methods
+        private void CheckColors()
+        {
+            // korisniku je dozvoljeno da ne unese boje,
+            // ali je onda podrazumevano da je u boji canvasa, odnosno belo.
+            if (borderColor == null)
+                borderColor = new SolidColorBrush(Colors.White);
+            if (fillColor == null)
+                fillColor = new SolidColorBrush(Colors.White);
+        }
+
         private void LockAndSet()
         {
             tbHeight.IsReadOnly = true;

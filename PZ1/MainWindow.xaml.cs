@@ -97,6 +97,10 @@ namespace PZ1
                     }
                     List.Add(Object);
 
+                    // posto je nacrtano, ne zelimo da pamtimo
+                    // koji je prethodni bio oblik
+                    clickedName = null;
+
                     // posto smo dodali novi element
                     // cistimo undo listu, da redo ne bi
                     // mogao da radi
@@ -113,13 +117,33 @@ namespace PZ1
             var clicked = (MenuItem)sender;
             clickedName = clicked.Name;
             if (clickedName == "ellipse")
+            {
                 ellipse.Background = menuItemBrush;
+                rectangle.Background = null;
+                polygon.Background = null;
+                image.Background = null;
+            }
             else if (clickedName == "rectangle")
+            {
+                ellipse.Background = null;
                 rectangle.Background = menuItemBrush;
+                polygon.Background = null;
+                image.Background = null;
+            }
             else if (clickedName == "polygon")
+            {
+                ellipse.Background = null;
+                rectangle.Background = null;
                 polygon.Background = menuItemBrush;
+                image.Background = null;
+            }
             else if (clickedName == "image")
+            {
+                ellipse.Background = null;
+                rectangle.Background = null;
+                polygon.Background = null;
                 image.Background = menuItemBrush;
+            }
         }
 
         private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
