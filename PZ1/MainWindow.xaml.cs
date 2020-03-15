@@ -24,8 +24,9 @@ namespace PZ1
         public static Point Point;
         public static string clickedName;
         public static object Object;
-        public static List<object> List;
-        public static List<object> UndoList;
+        private static List<object> objectList;
+        private static List<object> clearList;
+        private static Stack<object> stackUndo;
         public static List<Point> PolygonPoints;
         // promenljiva koja se aktivira kada je sve ocisnjeno
         // da bi mogli odjenom da vratimo sve
@@ -47,8 +48,13 @@ namespace PZ1
         public MainWindow()
         {
             InitializeComponent();
-            List = new List<object>();
-            UndoList = new List<object>();
+            objectList = new List<object>();
+            // lista koja sluzi samo za ciscenje 
+            // celog canvasa
+            clearList = new List<object>();
+            // koristimo Stack za undo/redo akciju
+            // jer je O(1)
+            stackUndo = new Stack<object>();
             PolygonPoints = new List<Point>();
             AllCleared = false;
             IsPolygon = false;
@@ -95,7 +101,7 @@ namespace PZ1
                         image.MouseLeftButtonDown += OnObjectClicked;
                         canvas.Children.Add(image);
                     }
-                    List.Add(Object);
+                    objectList.Add(Object);
 
                     // posto je nacrtano, ne zelimo da pamtimo
                     // koji je prethodni bio oblik
@@ -104,7 +110,7 @@ namespace PZ1
                     // posto smo dodali novi element
                     // cistimo undo listu, da redo ne bi
                     // mogao da radi
-                    UndoList.Clear();
+                    clearList.Clear();
                 }
                 ellipse.Background = null;
                 rectangle.Background = null;
@@ -160,12 +166,12 @@ namespace PZ1
 
                     PolygonPoints.Clear();
 
-                    List.Add(Object);
+                    objectList.Add(Object);
 
                     // posto smo dodali novi element
                     // cistimo undo listu, da redo ne bi
                     // mogao da radi
-                    UndoList.Clear();
+                    clearList.Clear();
 
                     // posto je poligon iscrtan
                     // treba da ga deaktiviramo
@@ -260,13 +266,13 @@ namespace PZ1
             Polygon polygon;
             Image image;
 
-            foreach (var obj in List)
+            foreach (var obj in objectList)
             {
                 try
                 {
                     ellipse = (Ellipse)obj;
                     //prvo dodamo u Undo listu da bi mogli da vratimo
-                    UndoList.Add(ellipse);
+                    clearList.Add(ellipse);
                     canvas.Children.Remove(ellipse);
                 }
                 catch
@@ -275,7 +281,7 @@ namespace PZ1
                     {
                         rectangle = (Rectangle)obj;
                         //prvo dodamo u Undo listu da bi mogli da vratimo
-                        UndoList.Add(rectangle);
+                        clearList.Add(rectangle);
                         canvas.Children.Remove(rectangle);
                     }
                     catch
@@ -284,7 +290,7 @@ namespace PZ1
                         {
                             polygon = (Polygon)obj;
                             //prvo dodamo u Undo listu da bi mogli da vratimo
-                            UndoList.Add(polygon);
+                            clearList.Add(polygon);
                             canvas.Children.Remove(polygon);
                         }
                         catch
@@ -293,7 +299,7 @@ namespace PZ1
                             {
                                 image = (Image)obj;
                                 //prvo dodamo u Undo listu da bi mogli da vratimo
-                                UndoList.Add(image);
+                                clearList.Add(image);
                                 canvas.Children.Remove(image);
                             }
                             catch 
@@ -313,7 +319,32 @@ namespace PZ1
             // ako je uradjen clear, vracamo sve odjednom
             if (AllCleared == true)
             {
-                foreach (var obj in UndoList)
+                foreach (var obj in stackUndo)
+                {
+                    var poppedObj = stackUndo.Pop();
+                    if (poppedObj is Ellipse)
+                    {
+                        Ellipse ell = (Ellipse)poppedObj;
+                        canvas.Children.Add(ell);
+                    }
+                    else if (poppedObj is Rectangle)
+                    {
+                        Rectangle rec = (Rectangle)poppedObj;
+                        canvas.Children.Add(rec);
+                    }
+                    else if (poppedObj is Polygon)
+                    {
+                        Polygon pol = (Polygon)poppedObj;
+                        canvas.Children.Add(pol);
+                    }
+                    else if (poppedObj is Image)
+                    {
+                        Image img = (Image)poppedObj;
+                        canvas.Children.Add(img);
+                    }
+                }
+                /*
+                foreach (var obj in clearList)
                 {
                     try
                     {
@@ -344,13 +375,18 @@ namespace PZ1
                         }
                     }
                 }
-                UndoList.Clear();
+                clearList.Clear();*/
                 // posto je vracemo, onemogucavamo ovu naredbu
                 AllCleared = false;
             }
             else if (canvas.Children.Count > 0)
             {
-                UndoList.Add(canvas.Children[canvas.Children.Count - 1]);
+                //UndoList.Add(canvas.Children[canvas.Children.Count - 1]);
+
+                // smestamo poslednji iz liste na stack
+                stackUndo.Push(canvas.Children[canvas.Children.Count - 1]);
+
+                // uklanjamo poslednji sa canvasa
                 canvas.Children.RemoveAt(canvas.Children.Count - 1);
             }
         }
@@ -359,40 +395,70 @@ namespace PZ1
         #region Redo
         private void MenuItem_Redo(object sender, MouseButtonEventArgs e)
         {
-            if (UndoList.Count > 0 && AllCleared == false /*da ne moze da se pozove ako je prethodna naredba bila clear*/)
+            if (stackUndo.Count > 0 && AllCleared == false /*da ne moze da se pozove ako je prethodna naredba bila clear*/)
             {
-                try
+                var poppedObj = stackUndo.Pop();
+                if (poppedObj is Ellipse)
                 {
-                    canvas.Children.Add((Ellipse)UndoList[UndoList.Count - 1]);
-                    UndoList.RemoveAt(UndoList.Count - 1);
+                    Ellipse ell = (Ellipse)poppedObj;
+                    canvas.Children.Add(ell);
                 }
-                catch
+                else if (poppedObj is Rectangle)
                 {
-                    try
-                    {
-                        canvas.Children.Add((Rectangle)UndoList[UndoList.Count - 1]);
-                        UndoList.RemoveAt(UndoList.Count - 1);
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            canvas.Children.Add((Polygon)UndoList[UndoList.Count - 1]);
-                            UndoList.RemoveAt(UndoList.Count - 1);
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                canvas.Children.Add((Image)UndoList[UndoList.Count - 1]);
-                                UndoList.RemoveAt(UndoList.Count - 1);
-                            }
-                            catch
-                            {
-                            }
-                        }
-                    }
+                    Rectangle rec = (Rectangle)poppedObj;
+                    canvas.Children.Add(rec);
                 }
+                else if (poppedObj is Polygon)
+                {
+                    Polygon pol = (Polygon)poppedObj;
+                    canvas.Children.Add(pol);
+                }
+                else if (poppedObj is Image)
+                {
+                    Image img = (Image)poppedObj;
+                    canvas.Children.Add(img);
+                }
+
+                //try
+                //{
+                //    Ellipse ellipseTemp = (Ellipse)stackUndo.Pop();
+                //    canvas.Children.Add(ellipseTemp);
+                //    //canvas.Children.Add((Ellipse)UndoList[UndoList.Count - 1]);
+                //    //UndoList.RemoveAt(UndoList.Count - 1);
+                //}
+                //catch
+                //{
+                //    try
+                //    {
+                //        Rectangle rectangleTemp = (Rectangle)stackUndo.Pop();
+                //        canvas.Children.Add(rectangleTemp);
+                //        //canvas.Children.Add((Rectangle)UndoList[UndoList.Count - 1]);
+                //        //UndoList.RemoveAt(UndoList.Count - 1);
+                //    }
+                //    catch
+                //    {
+                //        try
+                //        {
+                //            Polygon polygonTemp = (Polygon)stackUndo.Pop();
+                //            canvas.Children.Add(polygonTemp);
+                //            //canvas.Children.Add((Polygon)UndoList[UndoList.Count - 1]);
+                //            //UndoList.RemoveAt(UndoList.Count - 1);
+                //        }
+                //        catch
+                //        {
+                //            try
+                //            {
+                //                Image imageTemp = (Image)stackUndo.Pop();
+                //                canvas.Children.Add(imageTemp);
+                //                //canvas.Children.Add((Image)UndoList[UndoList.Count - 1]);
+                //                //UndoList.RemoveAt(UndoList.Count - 1);
+                //            }
+                //            catch
+                //            {
+                //            }
+                //        }
+                //    }
+                //}
             }
         }
         #endregion
