@@ -96,6 +96,7 @@ namespace PZ1
                         canvas.Children.Add(image);
                     }
                     List.Add(Object);
+                    Object = null;
 
                     // posto je nacrtano, ne zelimo da pamtimo
                     // koji je prethodni bio oblik
